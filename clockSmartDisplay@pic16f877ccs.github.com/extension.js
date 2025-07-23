@@ -4,7 +4,7 @@ import Clutter from "gi://Clutter";
 import Pango from "gi://Pango";
 
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
-import * as main from "resource:///org/gnome/shell/ui/main.js";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
 
 export default class DateTimeFormatExtension extends Extension {
     _updateDateTime() {
@@ -30,8 +30,8 @@ export default class DateTimeFormatExtension extends Extension {
             "vtime": '%H\n%M'
         };
 
-        if (main.panel.statusArea.dateMenu._clockDisplay) {
-            this._systemClockLabel = main.panel.statusArea.dateMenu._clockDisplay;
+        if (Main.panel.statusArea.dateMenu._clockDisplay) {
+            this._systemClockLabel = Main.panel.statusArea.dateMenu._clockDisplay;
         }
 
         this._dateTimeLabel = new St.Label({ style_class: "clock", });
