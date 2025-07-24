@@ -39,7 +39,13 @@ export default class DateTimeFormatExtension extends Extension {
         this._dateTimeLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
 
         this._settings = this.getSettings();
+
         this._currentFormat = this._settings.get_string("format");
+        this._format = this._dateTimeFormats[this._currentFormat] ||
+            this._dateTimeFormats['datetime'];
+        this._dateTimeLabel.set_text(
+            GLib.DateTime.new_now_local().format(this._format)
+        );
 
         this._systemClockLabel.hide();
         this._systemClockLabel
@@ -54,10 +60,10 @@ export default class DateTimeFormatExtension extends Extension {
 
         this._formatChangedId = this._settings.connect('changed::format', (settings, key) => {
             this._currentFormat = settings.get_string(key);
-            const format =this._dateTimeFormats[this._currentFormat] ||
+            this._format = this._dateTimeFormats[this._currentFormat] ||
                 this._dateTimeFormats['datetime'];
             this._dateTimeLabel.set_text(
-                GLib.DateTime.new_now_local().format(format)
+                GLib.DateTime.new_now_local().format(this._format)
             );
         });
     }
