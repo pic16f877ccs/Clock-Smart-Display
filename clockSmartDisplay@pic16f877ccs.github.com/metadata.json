@@ -3,9 +3,12 @@
     "uuid": "clockSmartDisplay@pic16f877ccs.github.com",
     "name": "Clock Smart Display",
     "description": "Customize and smartly format the GNOME clock display, including date, time, and layout options.",
-    "shell-version": [ "48" ],
+    "shell-version": [
+        "48",
+        "49"
+    ],
     "settings-schema": "org.gnome.shell.extensions.clock-smart-display",
-    "version": 1,
+    "version": 3,
     "url": "https://github.com/pic16f877ccs/Clock-Smart-Display",
     "version-name": "1.0.2"
 }
