@@ -35,9 +35,13 @@ nested() {
     fi
 
     echo '...'
-    export MUTTER_DEBUG_NUM_DUMMY_MONITORS=1 
 
-    dbus-run-session -- gnome-shell --unsafe-mode --nested --wayland --no-x11
+    if [ "$(gnome-shell --version | awk '{print int($3)}')" -ge 49 ]; then
+        dbus-run-session gnome-shell --devkit --wayland
+    else
+        export MUTTER_DEBUG_NUM_DUMMY_MONITORS=1 
+        dbus-run-session -- gnome-shell --unsafe-mode --nested --wayland --no-x11
+    fi
 }
 
 debug() {
