@@ -2,7 +2,7 @@
 set -e
 
 readonly _EXTENSION='clockSmartDisplay@pic16f877ccs.github.com'
-readonly _EXTENSION_NAME='Clock Smart Display'
+readonly _EXTENSION_NAME='clock-smart-display'
 
 build() {
     mkdir -p './build/temp/'
@@ -12,10 +12,18 @@ build() {
     cp -r $(find './src/' -mindepth 1 -maxdepth 1 -not -name 'assets') './build/temp/'
 
     echo 'Packing...'
+    local extra_source_list=$(find "${PWD}/build/temp/" -mindepth 1 -maxdepth 1 ! -name 'metadata.json' ! -name 'extension.js' ! -name 'prefs.js' ! -name     'stylesheet.css')
+
+    local extra_sources=()
+    local extra_source
+
+    for extra_source in "$extra_source_list"; do
+      extra_sources+=("--extra-source=${extra_source}")
+    done
 
     local path_to_schema="${PWD}/assets/org.gnome.shell.extensions.clock-smart-display.gschema.xml"
 
-    if gnome-extensions pack -f -o './build/dist' --schema="$path_to_schema" './build/temp'; then
+    if gnome-extensions pack -f -o './build/dist' --schema="$path_to_schema" "$extra_sources" './build/temp'; then
         echo '...'
         echo 'Success!'
     fi
@@ -31,11 +39,14 @@ nested() {
     else
         if [ "$first_arg" = '--fullhd' ]; then
             echo 'Full Hd screen size...'
+            echo '...'
 
             export MUTTER_DEBUG_DUMMY_MODE_SPECS=1920x1080 
             export MUTTER_DEBUG_DUMMY_MONITOR_SCALES=1.5 
         else
             echo 'UHD screen size...'
+            echo '...'
+
             export MUTTER_DEBUG_DUMMY_MODE_SPECS=3840x2100 
             export MUTTER_DEBUG_DUMMY_MONITOR_SCALES=2.0 
         fi
@@ -60,6 +71,8 @@ debug() {
         enable
     fi
 
+    build
+    install
     nested "$fullhd"
 }
 
