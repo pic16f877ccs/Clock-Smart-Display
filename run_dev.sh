@@ -3,29 +3,42 @@ set -e
 
 readonly _EXTENSION='clockSmartDisplay@pic16f877ccs.github.com'
 readonly _EXTENSION_NAME='clock-smart-display'
+readonly PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly BUILD_DIST="${PROJECT_ROOT}/build/dist/"
 
 build() {
-    mkdir -p './build/temp/'
-    mkdir -p './build/dist/'
+    local build_temp="${PROJECT_ROOT}/build/temp/"
+    local path_to_schema="${PROJECT_ROOT}/assets/org.gnome.shell.extensions.clock-smart-display.gschema.xml"
+    local path_to_src="${PROJECT_ROOT}/src/"
 
-    rm -rf "./build/temp/*"
-    cp -r $(find './src/' -mindepth 1 -maxdepth 1 -not -name 'assets') './build/temp/'
+    mkdir -p "$build_temp"
+    mkdir -p "$BUILD_DIST"
+
+    rm -rf "${build_temp:?}"/*
+
+    find "$path_to_src" -mindepth 1 -maxdepth 1 -not -name 'assets' -exec cp -r {} "$build_temp" \;
 
     echo 'Packing...'
-    local extra_source_list=$(find "${PWD}/build/temp/" -mindepth 1 -maxdepth 1 ! -name 'metadata.json' ! -name 'extension.js' ! -name 'prefs.js' ! -name     'stylesheet.css')
 
-    local extra_sources=()
+    local extra_sources_list=()
     local extra_source
+    local extra_sources=()
 
-    for extra_source in "$extra_source_list"; do
-      extra_sources+=("--extra-source=${extra_source}")
+    mapfile -t extra_source_list < <(find "${build_temp}" -mindepth 1 -maxdepth 1 \
+        ! -name 'metadata.json' ! -name 'extension.js' ! -name 'prefs.js' ! -name 'stylesheet.css')
+
+    for extra_source in "${extra_source_list[@]}"; do
+        extra_sources+=("--extra-source=${extra_source}")
     done
 
-    local path_to_schema="${PWD}/assets/org.gnome.shell.extensions.clock-smart-display.gschema.xml"
 
-    if gnome-extensions pack -f -o './build/dist' --schema="$path_to_schema" "$extra_sources" './build/temp'; then
+    if gnome-extensions pack -f -o "$BUILD_DIST" \
+        --schema="$path_to_schema" \
+        "${extra_sources[@]}" \
+        "$build_temp"; then
+    #if gnome-extensions pack -f -o "$BUILD_DIST" --schema="$path_to_schema" "${extra_sources[@]}" "$build_temp"; then
         echo '...'
-        echo 'Success!'
+        echo 'Build successful.'
     fi
 }
 
@@ -84,7 +97,7 @@ install() {
     fi
 
     echo 'Installing...'
-    gnome-extensions install --force "./build/dist/${_EXTENSION}.shell-extension.zip"
+    gnome-extensions install --force "${BUILD_DIST}${_EXTENSION}.shell-extension.zip"
     echo '...'
     echo 'Success!'
 }

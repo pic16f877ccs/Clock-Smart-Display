@@ -33,7 +33,9 @@ export default class DateTimeFormatExtension extends Extension {
         }
 
         const formatString = this._getFormatString(this._format);
-        const formattedText = GLib.DateTime.new_now_local().format(formatString);
+        const formattedText = GLib.DateTime.new_now_local().format(
+            this._format === 'other' ? this._userFormatString : formatString
+        );
         //this._dateTimeLabel.set_text(formattedText);
         this._dateTimeLabel.clutter_text.set_markup(formattedText);
 
@@ -84,6 +86,7 @@ export default class DateTimeFormatExtension extends Extension {
         this._settings = this.getSettings();
         const rawFormat = this._settings.get_string("format");
         this._format = this._validateFormatKey(rawFormat);
+        this._userFormatString = this._settings.get_value('user-format').deepUnpack().userFormat;
 
         // If format was invalid, save the corrected value
         if (rawFormat !== this._format) {
@@ -118,6 +121,11 @@ export default class DateTimeFormatExtension extends Extension {
             this._updateDateTime();
         });
 
+        this._userFormatChangedId = this._settings.connect('changed::user-format', (settings, key) => {
+            this._userFormatString = this._settings.get_value('user-format').deepUnpack().userFormat;
+            this._updateDateTime();
+        });
+
         logDebug('Extension enabled successfully');
     }
 
@@ -135,6 +143,12 @@ export default class DateTimeFormatExtension extends Extension {
         if (this._formatChangedId) {
             this._settings.disconnect(this._formatChangedId);
             this._formatChangedId = null;
+        }
+
+        // Disconnect settings signal
+        if (this._userFormatChangedId) {
+            this._settings.disconnect(this._userFormatChangedId);
+            this._userFormatChangedId = null;
         }
 
         // Clear settings reference

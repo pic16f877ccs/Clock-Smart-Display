@@ -1,5 +1,6 @@
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
+import GLib from 'gi://GLib';
 
 import {ExtensionPreferences,
     gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
@@ -24,14 +25,21 @@ export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
         const displayFormat = Object.keys(DATE_TIME_FORMATS);
         const datetimeFormatOptions = Gtk.StringList.new(displayFormat);
 
+        // Validate and set the current format
+        const currentFormat = window._settings.get_string('format');
+
+        const customDatetimeFormatEntryRow = new Adw.EntryRow({
+            title: _('Users Datetime format'),
+            sensitive: currentFormat === 'other' ? true : false,
+            width_chars: 100,
+        });
+
         const datetimeFormatComboRow = new Adw.ComboRow({
             title: _('Datetime format'),
             subtitle: _('Datetime format of the extension in the panel'),
             model: datetimeFormatOptions,
         });
 
-        // Validate and set the current format
-        const currentFormat = window._settings.get_string('format');
         const formatIndex = displayFormat.indexOf(currentFormat);
         datetimeFormatComboRow.selected = formatIndex >= 0 ? formatIndex : 0;
 
@@ -42,6 +50,9 @@ export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
                 if (selectedIndex >= 0 && selectedIndex < displayFormat.length) {
                     const selectedFormat = displayFormat[selectedIndex];
                     window._settings.set_string('format', selectedFormat);
+
+                    customDatetimeFormatEntryRow.sensitive = window._settings
+                        .get_string('format') === 'other' ? true : false
                 }
             } catch (e) {
                 console.error(`[${EXTENSION_UUID}] Error setting format: ${e.message}`);
@@ -49,6 +60,20 @@ export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
         });
         
         formatGroup.add(datetimeFormatComboRow);
+
+        const customFormat = window._settings.get_value('user-format').deepUnpack().userFormat;
+        customDatetimeFormatEntryRow.set_text(customFormat);
+
+        customDatetimeFormatEntryRow.connect('changed', (row) => {
+            const userFormat = GLib.Variant.new('a{ss}',
+                {
+                    'userFormat': row.text,
+                }
+            );
+            window._settings.set_value('user-format', userFormat);
+        });
+
+        formatGroup.add(customDatetimeFormatEntryRow);
     }
 }
 

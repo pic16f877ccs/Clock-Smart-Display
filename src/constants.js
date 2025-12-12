@@ -13,7 +13,8 @@ export const DATE_TIME_FORMATS = {
     "rfc": '%a, %d %b %Y %H:%M:%S %z',
     "full": '%a, %d %b %Y %H:%M',
     "vtime": '%H\n%M',
-    "two-line": '<small>' + '%Y-%m-%d\n %H:%M:%S' + '</small>'
+    "two-line": '<small>' + '%Y-%m-%d\n %H:%M:%S' + '</small>',
+    "other": 'YYYY-MM-DD'
 };
 
 export const UPDATE_INTERVAL_MS = 1000;
