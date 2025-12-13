@@ -1,7 +1,7 @@
-import GLib from "gi://GLib";
-import St from "gi://St";
 import Clutter from "gi://Clutter";
+import GLib from "gi://GLib";
 import Pango from "gi://Pango";
+import St from "gi://St";
 
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
@@ -36,7 +36,6 @@ export default class DateTimeFormatExtension extends Extension {
         const formattedText = GLib.DateTime.new_now_local().format(
             this._format === 'other' ? this._userFormatString : formatString
         );
-        //this._dateTimeLabel.set_text(formattedText);
         this._dateTimeLabel.clutter_text.set_markup(formattedText);
 
         return true;
@@ -111,7 +110,7 @@ export default class DateTimeFormatExtension extends Extension {
         this._timeoutID = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
             UPDATE_INTERVAL_MS,
-            this._updateDateTime.bind(this)
+            this._updateDateTime.bind(this),
         );
 
         // Listen for format changes
@@ -165,9 +164,7 @@ export default class DateTimeFormatExtension extends Extension {
             // Show system clock again
             this._systemClockLabel.show();
         }
+
         logDebug('Extension disabled successfully');
     }
 }
-        //this._dateTimeLabel.clutter_text.single_line_mode = true;
-        //this._dateTimeLabel.clutter_text.line_alignment = Pango.Alignment.RIGHT;
-        //this._dateTimeLabel.clutter_text.justify = true;
