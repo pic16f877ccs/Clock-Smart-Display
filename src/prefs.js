@@ -5,11 +5,10 @@ import GLib from 'gi://GLib';
 import {ExtensionPreferences,
     gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import { DATE_TIME_FORMATS, EXTENSION_UUID } from './constants.js';
+import { DATE_TIME_FORMATS } from './constants.js';
 
 export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
-        window._settings = this.getSettings();
 
         const page = new Adw.PreferencesPage({
             title: null,
@@ -21,17 +20,15 @@ export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
         formatGroup.set_separate_rows?.(true);
         page.add(formatGroup);
 
-        // Use the format keys from the shared constant
         const displayFormat = Object.keys(DATE_TIME_FORMATS);
         const datetimeFormatOptions = Gtk.StringList.new(displayFormat);
 
-        // Validate and set the current format
+        window._settings = this.getSettings();
         const currentFormat = window._settings.get_string('format');
 
         const customDatetimeFormatEntryRow = new Adw.EntryRow({
             title: _('Users Datetime format'),
             sensitive: currentFormat === 'other' ? true : false,
-            width_chars: 100,
         });
 
         const datetimeFormatComboRow = new Adw.ComboRow({
@@ -40,23 +37,14 @@ export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
             model: datetimeFormatOptions,
         });
 
-        const formatIndex = displayFormat.indexOf(currentFormat);
-        datetimeFormatComboRow.selected = formatIndex >= 0 ? formatIndex : 0;
+        datetimeFormatComboRow.selected = displayFormat.indexOf(currentFormat);
 
-        // Handle format changes with validation
         datetimeFormatComboRow.connect('notify::selected-item', () => {
-            try {
-                const selectedIndex = datetimeFormatComboRow.get_selected();
-                if (selectedIndex >= 0 && selectedIndex < displayFormat.length) {
-                    const selectedFormat = displayFormat[selectedIndex];
-                    window._settings.set_string('format', selectedFormat);
+            const selectedIndex = datetimeFormatComboRow.get_selected();
+            window._settings.set_string('format', displayFormat[selectedIndex]);
 
-                    customDatetimeFormatEntryRow.sensitive = window._settings
-                        .get_string('format') === 'other' ? true : false
-                }
-            } catch (e) {
-                console.error(`[${EXTENSION_UUID}] Error setting format: ${e.message}`);
-            }
+            customDatetimeFormatEntryRow.sensitive = window._settings
+                .get_string('format') === 'other' ? true : false
         });
         
         formatGroup.add(datetimeFormatComboRow);
