@@ -36,7 +36,7 @@ export default class DateTimeFormatExtension extends Extension {
         const formattedText = GLib.DateTime.new_now_local().format(
             this._format === 'other' ? this._userFormatString : formatString
         );
-        this._dateTimeLabel.clutter_text.set_markup(formattedText);
+        this._dateTimeLabel.clutter_text.set_markup(formattedText.slice(0, 50));
 
         return true;
     }
@@ -104,6 +104,7 @@ export default class DateTimeFormatExtension extends Extension {
         // Listen for custom format changes
         this._userFormatChangedId = this._settings.connect('changed::user-format', (settings, key) => {
             this._userFormatString = this._settings.get_value('user-format').deepUnpack().userFormat;
+
             this._updateDateTime();
         });
 
