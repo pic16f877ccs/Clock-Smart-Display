@@ -101,6 +101,7 @@ export default class DateTimeFormatExtension extends Extension {
             this._updateDateTime();
         });
 
+        // Listen for custom format changes
         this._userFormatChangedId = this._settings.connect('changed::user-format', (settings, key) => {
             this._userFormatString = this._settings.get_value('user-format').deepUnpack().userFormat;
             this._updateDateTime();
@@ -119,13 +120,12 @@ export default class DateTimeFormatExtension extends Extension {
             this._timeoutID = null;
         }
 
-        // Disconnect settings signal
+        // Disconnect settings signals
         if (this._formatChangedId) {
             this._settings.disconnect(this._formatChangedId);
             this._formatChangedId = null;
         }
 
-        // Disconnect settings signal
         if (this._userFormatChangedId) {
             this._settings.disconnect(this._userFormatChangedId);
             this._userFormatChangedId = null;
