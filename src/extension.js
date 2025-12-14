@@ -51,19 +51,6 @@ export default class DateTimeFormatExtension extends Extension {
     }
 
     /**
-     * Validate that a format key is in the allowed list
-     * @param {string} formatKey - The format key to validate
-     * @returns {string} Valid format key (may be default if input was invalid)
-     */
-    _validateFormatKey(formatKey) {
-        if (!formatKey || !DATE_TIME_FORMATS[formatKey]) {
-            logDebug(`Invalid format key: ${formatKey}, defaulting to 'datetime'`);
-            return 'datetime';
-        }
-        return formatKey;
-    }
-
-    /**
      * Enable the extension
      */
     enable() {
@@ -81,16 +68,9 @@ export default class DateTimeFormatExtension extends Extension {
         this._dateTimeLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._dateTimeLabel.clutter_text.use_markup = true;
 
-        // Get settings and validate format
         this._settings = this.getSettings();
-        const rawFormat = this._settings.get_string("format");
-        this._format = this._validateFormatKey(rawFormat);
+        this._format = this._settings.get_string("format");
         this._userFormatString = this._settings.get_value('user-format').deepUnpack().userFormat;
-
-        // If format was invalid, save the corrected value
-        if (rawFormat !== this._format) {
-            this._settings.set_string("format", this._format);
-        }
 
         // Initial update
         this._updateDateTime();
@@ -103,6 +83,7 @@ export default class DateTimeFormatExtension extends Extension {
         } else {
             logError('System clock label has no parent');
             this.disable();
+
             return;
         }
 
@@ -115,8 +96,8 @@ export default class DateTimeFormatExtension extends Extension {
 
         // Listen for format changes
         this._formatChangedId = this._settings.connect('changed::format', (settings, key) => {
-            const newFormat = settings.get_string(key);
-            this._format = this._validateFormatKey(newFormat);
+            this._format = settings.get_string(key);
+
             this._updateDateTime();
         });
 
