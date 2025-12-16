@@ -3,9 +3,19 @@
     <schema id="org.gnome.shell.extensions.clock-smart-display" path="/org/gnome/shell/extensions/clock-smart-display/">
         <key name="format" type="s">
             <default>"datetime"</default>
+            <summary>Selecting predefined date and time formats</summary>
+            <description>
+                Various preset date and time formats (long, short, ISO and language-specific)
+            </description>
         </key>
         <key name="user-format" type="a{ss}">
             <default>{"userFormat": '%Y.%m.%d, %H:%M:%S'}</default>
+            <summary>Custom user-defined date and time format</summary>
+            <description>
+                Allows the user to specify their own format string using
+                standard strftime placeholders (e.g. %Y for year, %m for month,
+                %d for day, %H for hour, %M for minute, %S for second).
+            </description>
         </key>
     </schema>
 </schemalist>
