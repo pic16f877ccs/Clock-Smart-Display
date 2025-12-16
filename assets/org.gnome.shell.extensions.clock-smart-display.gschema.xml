@@ -5,7 +5,7 @@
             <default>"datetime"</default>
         </key>
         <key name="user-format" type="a{ss}">
-            <default>{"userFormat": "%Y-%m-%d %H:%M"}</default>
+            <default>{"userFormat": '%Y.%m.%d, %H:%M:%S'}</default>
         </key>
     </schema>
 </schemalist>
