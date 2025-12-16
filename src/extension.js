@@ -36,7 +36,8 @@ export default class DateTimeFormatExtension extends Extension {
         const formattedText = GLib.DateTime.new_now_local().format(
             this._format === 'other' ? this._userFormatString : formatString
         );
-        this._dateTimeLabel.clutter_text.set_markup(formattedText.slice(0, 50));
+        this._dateTimeLabel.clutter_text.set_markup(formattedText);
+        //this._dateTimeLabel.clutter_text.set_markup(formattedText.slice(0, 50));
 
         return true;
     }
@@ -48,6 +49,16 @@ export default class DateTimeFormatExtension extends Extension {
      */
     _getFormatString(formatKey) {
         return DATE_TIME_FORMATS[formatKey] || DATE_TIME_FORMATS['datetime'];
+    }
+
+    _updateDatetimeLabelWidth() {
+        const dateTimeTextLenght = this._dateTimeLabel.clutter_text.get_text().length;
+        if (dateTimeTextLenght > 30) {
+            const dateTimeLabelWidth = this._dateTimeLabel.clutter_text.get_width() - 5;
+            this._dateTimeLabel.clutter_text.set_width(dateTimeLabelWidth);
+        } else {
+            this._dateTimeLabel.clutter_text.set_width(-1);
+        }
     }
 
     /**
@@ -65,15 +76,17 @@ export default class DateTimeFormatExtension extends Extension {
         // Create the custom date/time label
         this._dateTimeLabel = new St.Label({ style_class: "clock" });
         this._dateTimeLabel.clutter_text.y_align = Clutter.ActorAlign.CENTER;
-        this._dateTimeLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._dateTimeLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._dateTimeLabel.clutter_text.use_markup = true;
+        //this._dateTimeLabel.clutter_text.max_length = 25;
+        //
+        // Initial update
+        this._updateDateTime();
+        this._updateDatetimeLabelWidth();
 
         this._settings = this.getSettings();
         this._format = this._settings.get_string("format");
         this._userFormatString = this._settings.get_value('user-format').deepUnpack().userFormat;
-
-        // Initial update
-        this._updateDateTime();
 
         // Hide system clock and insert our label
         this._systemClockLabel.hide();
@@ -106,6 +119,7 @@ export default class DateTimeFormatExtension extends Extension {
             this._userFormatString = this._settings.get_value('user-format').deepUnpack().userFormat;
 
             this._updateDateTime();
+            this._updateDatetimeLabelWidth();
         });
 
         logDebug('Extension enabled successfully');
