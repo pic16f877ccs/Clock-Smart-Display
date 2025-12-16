@@ -37,7 +37,6 @@ export default class DateTimeFormatExtension extends Extension {
             this._format === 'other' ? this._userFormatString : formatString
         );
         this._dateTimeLabel.clutter_text.set_markup(formattedText);
-        //this._dateTimeLabel.clutter_text.set_markup(formattedText.slice(0, 50));
 
         return true;
     }
@@ -78,8 +77,7 @@ export default class DateTimeFormatExtension extends Extension {
         this._dateTimeLabel.clutter_text.y_align = Clutter.ActorAlign.CENTER;
         this._dateTimeLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._dateTimeLabel.clutter_text.use_markup = true;
-        //this._dateTimeLabel.clutter_text.max_length = 25;
-        //
+
         // Initial update
         this._updateDateTime();
         this._updateDatetimeLabelWidth();
