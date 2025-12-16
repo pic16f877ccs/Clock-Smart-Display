@@ -29,6 +29,7 @@ export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
         const customDatetimeFormatEntryRow = new Adw.EntryRow({
             title: _('Users Datetime format'),
             sensitive: currentFormat === 'other' ? true : false,
+            show_apply_button: true,
         });
 
         const datetimeFormatComboRow = new Adw.ComboRow({
@@ -52,7 +53,7 @@ export default class ClockSmartDisplayPreferences extends ExtensionPreferences {
         const customFormat = window._settings.get_value('user-format').deepUnpack().userFormat;
         customDatetimeFormatEntryRow.set_text(customFormat);
 
-        customDatetimeFormatEntryRow.connect('changed', (row) => {
+        customDatetimeFormatEntryRow.connect('apply', (row) => {
             const userFormat = GLib.Variant.new('a{ss}',
                 {
                     'userFormat': row.text,
