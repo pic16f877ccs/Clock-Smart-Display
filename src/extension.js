@@ -1,3 +1,4 @@
+import Cogl from "gi://Cogl";
 import Clutter from "gi://Clutter";
 import GLib from "gi://GLib";
 import Pango from "gi://Pango";
@@ -50,6 +51,9 @@ export default class DateTimeFormatExtension extends Extension {
         return DATE_TIME_FORMATS[formatKey] || DATE_TIME_FORMATS['datetime'];
     }
 
+    /**
+     * Update the label width
+     */
     _updateDatetimeLabelWidth() {
         const dateTimeTextLenght = this._dateTimeLabel.clutter_text.get_text().length;
         if (dateTimeTextLenght > 30) {
@@ -133,12 +137,13 @@ export default class DateTimeFormatExtension extends Extension {
             this._timeoutID = null;
         }
 
-        // Disconnect settings signals
+        // Disconnect settings signal datetime format
         if (this._formatChangedId) {
             this._settings.disconnect(this._formatChangedId);
             this._formatChangedId = null;
         }
 
+        // Disconnect settings signal user datetime format
         if (this._userFormatChangedId) {
             this._settings.disconnect(this._userFormatChangedId);
             this._userFormatChangedId = null;
