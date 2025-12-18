@@ -1,4 +1,3 @@
-import Cogl from "gi://Cogl";
 import Clutter from "gi://Clutter";
 import GLib from "gi://GLib";
 import Pango from "gi://Pango";
