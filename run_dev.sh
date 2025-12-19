@@ -36,7 +36,7 @@ build() {
         --schema="$path_to_schema" \
         "${extra_sources[@]}" \
         "$build_temp"; then
-    #if gnome-extensions pack -f -o "$BUILD_DIST" --schema="$path_to_schema" "${extra_sources[@]}" "$build_temp"; then
+
         echo '...'
         echo 'Build successful.'
     fi
