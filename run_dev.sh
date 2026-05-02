@@ -46,19 +46,20 @@ nested() {
     local first_arg="${1}"
 
     echo '...'
+    export MUTTER_DEBUG_NUM_DUMMY_MONITORS=1 
 
     if [ "$(gnome-shell --version | awk '{print int($3)}')" -ge 49 ]; then
         dbus-run-session gnome-shell --devkit --wayland
     else
         if [ "$first_arg" = '--fullhd' ]; then
             echo 'Full Hd screen size...'
-            echo '...'
+            echo '...' 
 
             export MUTTER_DEBUG_DUMMY_MODE_SPECS=1920x1080 
             export MUTTER_DEBUG_DUMMY_MONITOR_SCALES=1.5 
         else
             echo 'UHD screen size...'
-            echo '...'
+            echo '...' 
 
             export MUTTER_DEBUG_DUMMY_MODE_SPECS=3840x2100 
             export MUTTER_DEBUG_DUMMY_MONITOR_SCALES=2.0 
@@ -73,6 +74,10 @@ debug() {
     local fullhd="${1}"
     echo 'Debugging...'
     echo '...'
+
+    build
+    install
+
     if gnome-extensions list | grep -Ewoq "$_EXTENSION"; then
         echo "The ${_EXTENSION} is installed"
     else
@@ -84,14 +89,12 @@ debug() {
         enable
     fi
 
-    build
-    install
     nested "$fullhd"
 }
 
 install() {
-    local second_arg="${2}"
-    if [[ "$second_arg" == '-b' ]]; then
+    local flag="${1}"
+    if [[ "$flag" == '-b' ]]; then
         build
         echo "..."
     fi
@@ -124,50 +127,71 @@ disable() {
 }
 
 prefs() {
-  echo 'Opening prefs...'
-  gnome-extensions prefs "$_EXTENSION"
+    echo 'Opening prefs...'
+    gnome-extensions prefs "$_EXTENSION"
+}
+ 
+key() {
+    local first_arg="${1:?Error: key name required}"
+
+    echo 'Reading setting key...'
+    echo '...'
+
+    dconf read "/org/gnome/shell/extensions/${_EXTENSION_NAME}/$first_arg"
+}
+ 
+list() {
+    echo 'List all setting keys...'
+    echo '...'
+    dconf list "/org/gnome/shell/extensions/${_EXTENSION_NAME}/"
 }
 
 watch() {
-  echo 'Watching for setting changes...'
-  dconf watch "/org/gnome/shell/extensions/${_EXTENSION_NAME}/"
+    echo 'Watching for setting changes...'
+    dconf watch "/org/gnome/shell/extensions/${_EXTENSION_NAME}/"
 }
 
 reset() {
-  echo 'Watching for setting changes...'
-  dconf reset -f "/org/gnome/shell/extensions/${_EXTENSION_NAME}/"
+    echo 'Resetting all settings...'
+    dconf reset -f "/org/gnome/shell/extensions/${_EXTENSION_NAME}/"
 }
 
 case "$1" in
 debug)
-  debug "$2"
-  ;;
+    debug "$2"
+    ;;
 build)
-  build
-  ;;
+    build
+    ;;
 install)
-  install "$1" "$2"
-  ;;
+    install "$2"
+    ;;
 uninstall)
-  uninstall
-  ;;
+    uninstall
+    ;;
 enable)
-  enable
-  ;;
+    enable
+    ;;
 disable)
-  disable
-  ;;
+    disable
+    ;;
 prefs)
-  prefs
-  ;;
+    prefs
+    ;;
+key)
+     key "$2"
+     ;;
+list)
+     list
+     ;;
 watch)
-  watch
-  ;;
+    watch
+    ;;
 reset)
-  reset
-  ;;
+    reset
+    ;;
 *)
-  echo "Usage: $0 {debug|build|install|uninstall|enable|disable|prefs|watch|reset}"
-  exit 1
-  ;;
+    echo "Usage: $0 {debug|build|install|uninstall|enable|disable|prefs|key|list|watch|reset}"
+    exit 1
+    ;;
 esac
